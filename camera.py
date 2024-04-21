@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
 from detection import AccidentDetectionModel
+from notification import AccidentNotification
 
+notification = AccidentNotification()
 model = AccidentDetectionModel("model.json", 'model_weights.h5')
 
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -24,14 +26,14 @@ def start_application():
         pred, prob = model.predict_accident(roi[np.newaxis, :, :])
 
         # Detect accident
-        # if prob > 0.86:  # Threshold adjusted to 0.7 (70%)
-        #     notification.play_beep()
-        #     if pred == "crash":
-        #         # Get latitude and longitude (example values)
-        #         accident_latitude = 28.6139
-        #         accident_longitude = 77.2090
-        #         notification.notify_accident(frame, accident_latitude, accident_longitude)
-        #         return "Accident detected"
+        if prob > 0.86:  # Threshold adjusted to 0.7 (70%)
+            notification.play_beep()
+            if pred == "crash":
+                # Get latitude and longitude (example values)
+                accident_latitude = 28.6139
+                accident_longitude = 77.2090
+                notification.notify_accident(frame, accident_latitude, accident_longitude)
+                return "Accident detected"
 
         result_text = f"{pred} {round(prob * 100, 2)}%"
         cv2.rectangle(frame, (0, 0), (300, 40), (0, 0, 0), -1)
